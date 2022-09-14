@@ -7,7 +7,7 @@ Developed a flashcard app that allows the user to tap and view the quetsions and
 
 ### App Walk-though
 
-<img src="http://g.recordit.co/qyf7XyoaT3.gif" width=200><br>
+<img src="http://g.recordit.co/sckDlhV3d1.gif" width=200><br>
 
 ## Required
 - [x] Create New Project in Android Studio

@@ -7,7 +7,7 @@ Updated flashcard app so the user can create and save new questions into a datab
 
 ### App Walk-though
 
-<img src="http://g.recordit.co/EOeipTvpto.gif" width=200><br>
+<img src="http://g.recordit.co/IM2PGWLpIr.gif" width=200><br>
 
 ## Required
 - [x] User can create a card and still see their created card when the app is relaunched.

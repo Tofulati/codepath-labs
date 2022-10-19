@@ -5,9 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         allFlashcards = flashcardDatabase.getAllCards().toMutableList()
 
         val flashcardQuestion = findViewById<TextView>(R.id.flashcard_question)
-        val flashcardAnswer = findViewById<TextView>(R.id.flascard_answer)
+        val flashcardAnswer = findViewById<TextView>(R.id.flashcard_answer)
         val addAddButton = findViewById<ImageView>(R.id.add_question_button)
         val nextQuestion = findViewById<ImageView>(R.id.next_question)
         var currentCardDisplayedIndex = 0
@@ -37,16 +38,48 @@ class MainActivity : AppCompatActivity() {
 
         flashcardAnswer.visibility = View.INVISIBLE
         flashcardQuestion.setOnClickListener {
-            flashcardQuestion.visibility = View.INVISIBLE
-            flashcardAnswer.visibility = View.VISIBLE
+            flashcardQuestion.animate()
+                .rotationY(90f)
+                .setDuration(200)
+                .withEndAction(
+                    Runnable {
+                        flashcardQuestion.setVisibility(View.INVISIBLE)
+                        flashcardAnswer.visibility = View.VISIBLE
+                        // second quarter turn
+                        flashcardAnswer.rotationY = -90f
+                        flashcardAnswer.animate()
+                            .rotationY(0f)
+                            .setDuration(200)
+                            .start()
+                    }
+                ).start()
         }
 
         flashcardAnswer.setOnClickListener {
-            flashcardQuestion.visibility = View.VISIBLE
-            flashcardAnswer.visibility = View.INVISIBLE
+            flashcardAnswer.animate()
+                .rotationY(90f)
+                .setDuration(200)
+                .withEndAction(
+                    Runnable {
+                        flashcardAnswer.setVisibility(View.INVISIBLE)
+                        flashcardQuestion.visibility = View.VISIBLE
+                        // second quarter turn
+                        flashcardQuestion.rotationY = -90f
+                        flashcardQuestion.animate()
+                            .rotationY(0f)
+                            .setDuration(200)
+                            .start()
+                    }
+                ).start()
         }
 
         nextQuestion.setOnClickListener {
+            val leftOutAnim = AnimationUtils.loadAnimation(this, R.anim.left_out)
+            val rightInAnim = AnimationUtils.loadAnimation(this, R.anim.right_in)
+            findViewById<View>(R.id.flashcard_question).startAnimation(leftOutAnim)
+            findViewById<View>(R.id.flashcard_question).startAnimation(rightInAnim)
+            findViewById<View>(R.id.flashcard_answer).startAnimation(leftOutAnim)
+            findViewById<View>(R.id.flashcard_answer).startAnimation(rightInAnim)
             if (allFlashcards.size == 0) {
                 // return here, so that the rest of the code in this onClickListener doesn't execute
                 return@setOnClickListener
@@ -55,11 +88,7 @@ class MainActivity : AppCompatActivity() {
             currentCardDisplayedIndex++
             // make sure we don't get an IndexOutOfBoundsError if we are viewing the last indexed card in our list
             if(currentCardDisplayedIndex >= allFlashcards.size) {
-                Snackbar.make(
-                    findViewById<TextView>(R.id.flashcard_question), // This should be the TextView for displaying your flashcard question
-                    "You've reached the end of the cards, going back to start.",
-                    Snackbar.LENGTH_SHORT)
-                    .show()
+                    findViewById<TextView>(R.id.flashcard_question) // This should be the TextView for displaying your flashcard question
                 currentCardDisplayedIndex = 0
             }
             // set the question and answer TextViews with data from the database
@@ -104,6 +133,7 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("question", flashcardQuestion.text);
             intent.putExtra("answer", flashcardAnswer.text);
             resultLauncher.launch(intent)
+            overridePendingTransition(R.anim.right_in, R.anim.left_out)
         }
     }
 }
